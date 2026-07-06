@@ -3,11 +3,11 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import util.Constants;
-import java.util.ArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ChatServer {
     private static final int PORT = Constants.PORT;
-    private static ArrayList<ClientHandler> clients=new ArrayList<>();
+    private static ConcurrentHashMap<String, ClientHandler> clients=new ConcurrentHashMap<>();
     public static void main(String args[]){
         try {
             ServerSocket serverSocket=new ServerSocket(PORT);
@@ -21,11 +21,10 @@ public class ChatServer {
                 Socket clientSocket=serverSocket.accept();
                 System.out.println("New client connected: "+clientSocket.getInetAddress());
                 ClientHandler clientHandler=new ClientHandler(clientSocket,clients);
-                clients.add(clientHandler);
                 clientHandler.start();
             }
 
-        } catch (Exception e) {
+        } catch (IOException e) {
             // TODO: handle exception
             e.printStackTrace();
         }

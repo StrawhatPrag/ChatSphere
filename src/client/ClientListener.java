@@ -18,7 +18,7 @@ public class ClientListener extends Thread {
             input=new DataInputStream(socket.getInputStream());
             while (true) {
                 String message=input.readUTF();
-                System.out.println("\nServer: "+message);
+                System.out.println(message);
             }
         } catch (IOException e) {
             System.out.println("Disconnected from server.");
