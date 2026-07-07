@@ -63,6 +63,18 @@ public class ClientHandler extends Thread{
         sendMessage("[Private to "+receiverUsername+"] "+privateMessage);
     }
 
+    private void handleUsersCommand(){
+        StringBuilder builder=new StringBuilder();
+        builder.append("\n------ Online Users ------\n");
+
+        for (String user:clients.keySet()){
+            builder.append(user).append("\n");
+        }
+
+        builder.append("--------------------------");
+        sendMessage(builder.toString());
+    }
+
     private void initializeStreams() throws IOException {
         input=new DataInputStream(socket.getInputStream());
         output=new DataOutputStream(socket.getOutputStream());
@@ -99,6 +111,9 @@ public class ClientHandler extends Thread{
             if (type.equals(MessageType.CHAT)) {
                 if(message.startsWith("/msg ")) {
                     handlePrivateMessage(message);
+                }
+                else if (message.startsWith("/users")){
+                    handleUsersCommand();
                 }
                 else {
                     String formattedMessage = username + ": " + message;
