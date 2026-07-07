@@ -75,6 +75,19 @@ public class ClientHandler extends Thread{
         sendMessage(builder.toString());
     }
 
+    private void handleHelpCommand(){
+        StringBuilder help=new StringBuilder();
+
+        help.append("\n==============ChatSphere Help==============\n");
+        help.append("/help                          Show available commands\n");
+        help.append("/users                         List online users\n");
+        help.append("/msg <user> <message>          Show available commands\n");
+        help.append("/quit                          Disconnect from server\n");
+        help.append("============================================\n");
+
+        sendMessage(help.toString());
+    }
+
     private void initializeStreams() throws IOException {
         input=new DataInputStream(socket.getInputStream());
         output=new DataOutputStream(socket.getOutputStream());
@@ -104,9 +117,13 @@ public class ClientHandler extends Thread{
     private void listenForMessages() throws IOException {
         while (true) {
             String packet = input.readUTF();
-            String[] parts = packet.split("\\|", 2);
+            String[] parts = packet.split("\\|");
             String type = parts[0];
-            String message = parts[1];
+
+            if(type.equals(MessageType.QUIT)){
+                break;
+            }
+            String message = parts.length>1?parts[1]:"";
 
             if (type.equals(MessageType.CHAT)) {
                 if(message.startsWith("/msg ")) {
@@ -114,6 +131,12 @@ public class ClientHandler extends Thread{
                 }
                 else if (message.startsWith("/users")){
                     handleUsersCommand();
+                }
+                else if (message.startsWith("/help")){
+                    handleHelpCommand();
+                }
+                else if (message.startsWith("/")) {
+                    sendMessage("Unknown command.\nType /help for available commands.");
                 }
                 else {
                     String formattedMessage = username + ": " + message;

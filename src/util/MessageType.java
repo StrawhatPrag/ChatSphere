@@ -5,4 +5,5 @@ public class MessageType {
     public static final String CHAT="CHAT";
     public static final String OK = "OK";
     public static final String ERROR = "ERROR";
+    public static final String QUIT = "QUIT";
 }

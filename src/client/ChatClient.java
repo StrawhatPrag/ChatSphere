@@ -46,9 +46,22 @@ public class ChatClient {
 
             while (true) {
                 String message=scanner.nextLine();
+
+                if(message.equals("/quit")){
+                    output.writeUTF(MessageType.QUIT);
+                    output.flush();
+
+                    System.out.println("Disconnecting...");
+                    socket.close();
+
+                    break;
+                }
+
                 output.writeUTF(MessageType.CHAT + "|" + message);
                 output.flush();
             }
+            System.out.println("Goodbye!");
+            
         } catch (IOException e) {
             // TODO: handle exception
             e.printStackTrace();
