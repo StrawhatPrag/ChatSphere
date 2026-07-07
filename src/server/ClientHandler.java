@@ -40,6 +40,29 @@ public class ClientHandler extends Thread{
         }
     }
 
+    private void handlePrivateMessage(String message) {
+        String[] parts =message.split(" ",3);
+
+        if (parts.length<3){
+            sendMessage("Usage: /msg <username> <message>");
+            return;
+        }
+
+        String receiverUsername=parts[1];
+        String privateMessage=parts[2];
+
+        ClientHandler receiver =clients.get(receiverUsername);
+
+        if (receiver==null){
+            sendMessage("User '"+receiverUsername+"' not found.");
+            return;
+        }
+
+        receiver.sendMessage("[Private] "+username+": "+privateMessage);
+
+        sendMessage("[Private to "+receiverUsername+"] "+privateMessage);
+    }
+
     private void initializeStreams() throws IOException {
         input=new DataInputStream(socket.getInputStream());
         output=new DataOutputStream(socket.getOutputStream());
@@ -74,9 +97,14 @@ public class ClientHandler extends Thread{
             String message = parts[1];
 
             if (type.equals(MessageType.CHAT)) {
-                String formattedMessage = username + ": " + message;
-                System.out.println(formattedMessage);
-                broadcast(formattedMessage);
+                if(message.startsWith("/msg ")) {
+                    handlePrivateMessage(message);
+                }
+                else {
+                    String formattedMessage = username + ": " + message;
+                    System.out.println(formattedMessage);
+                    broadcast(formattedMessage);
+                }
             }
         }
     }
