@@ -81,7 +81,7 @@ public class ClientHandler extends Thread{
         help.append("\n==============ChatSphere Help==============\n");
         help.append("/help                          Show available commands\n");
         help.append("/users                         List online users\n");
-        help.append("/msg <user> <message>          Show available commands\n");
+        help.append("/msg <user> <message>          Send a private message\n");
         help.append("/quit                          Disconnect from server\n");
         help.append("============================================\n");
 
@@ -114,35 +114,41 @@ public class ClientHandler extends Thread{
         broadcast("*** " + username + " joined the chat ***");
     }
 
+    private boolean processPacket(String packet){
+        String[] parts = packet.split("\\|", 2);
+        String type = parts[0];
+
+        if(type.equals(MessageType.QUIT)){
+            return false;
+        }
+        String message = parts.length>1?parts[1]:"";
+        if (type.equals(MessageType.CHAT)) {
+            if(message.startsWith("/msg ")) {
+                handlePrivateMessage(message);
+            }
+            else if (message.equals("/users")){
+                handleUsersCommand();
+            }
+            else if (message.equals("/help")){
+                handleHelpCommand();
+            }
+            else if (message.startsWith("/")) {
+                sendMessage("Unknown command.\nType /help for available commands.");
+            }
+            else {
+                String formattedMessage = username + ": " + message;
+                System.out.println(formattedMessage);
+                broadcast(formattedMessage);
+            }
+        }
+        return true;
+    }
+
     private void listenForMessages() throws IOException {
         while (true) {
             String packet = input.readUTF();
-            String[] parts = packet.split("\\|");
-            String type = parts[0];
-
-            if(type.equals(MessageType.QUIT)){
+            if (!processPacket(packet)) {
                 break;
-            }
-            String message = parts.length>1?parts[1]:"";
-
-            if (type.equals(MessageType.CHAT)) {
-                if(message.startsWith("/msg ")) {
-                    handlePrivateMessage(message);
-                }
-                else if (message.startsWith("/users")){
-                    handleUsersCommand();
-                }
-                else if (message.startsWith("/help")){
-                    handleHelpCommand();
-                }
-                else if (message.startsWith("/")) {
-                    sendMessage("Unknown command.\nType /help for available commands.");
-                }
-                else {
-                    String formattedMessage = username + ": " + message;
-                    System.out.println(formattedMessage);
-                    broadcast(formattedMessage);
-                }
             }
         }
     }
