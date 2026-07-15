@@ -34,9 +34,7 @@ public class ClientHandler extends Thread{
 
     private void broadcast(String message){
         for (ClientHandler client:clients.values()){
-            if (client!=this){
-                client.sendMessage(message);
-            }
+            client.sendMessage(message);
         }
     }
 

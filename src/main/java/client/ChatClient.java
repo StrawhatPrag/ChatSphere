@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.DataOutputStream;
 import java.io.DataInputStream;
 import java.net.Socket;
-import java.util.Scanner;
 import util.Constants;
 import util.MessageType;
 
@@ -12,63 +11,71 @@ public class ChatClient {
     private Socket socket;
     private DataOutputStream output;
     private DataInputStream input;
-    private Scanner scanner;
+    private ClientListener listener;
     
     public ChatClient(){
+        
+    }
+
+    public String connect(String username){
         try {
             socket=new Socket("localhost",Constants.PORT);
-            output=new DataOutputStream(socket.getOutputStream());
             input=new DataInputStream(socket.getInputStream());
-            scanner=new Scanner(System.in);
-            
-            while (true) {
-                System.out.print("Enter username: ");
-                String username=scanner.nextLine();
+            output=new DataOutputStream(socket.getOutputStream());
 
-                output.writeUTF(MessageType.LOGIN + "|" + username);
-                output.flush();
+            output.writeUTF(MessageType.LOGIN+"|"+username);
+            output.flush();
 
-                String response = input.readUTF();
-                if (response.equals(MessageType.OK)) {
-                    break;
-                }
+            String response=input.readUTF();
 
-                String[] parts = response.split("\\|", 2);
-                System.out.println(parts[1]);
+            if(response.equals(MessageType.OK)){
+                listener=new ClientListener(socket);
+                listener.start();
             }
+            return response;
 
-            System.out.println("Connected to ChatSphere Server!");
-            
-            ClientListener listener = new ClientListener(socket);
-            listener.start();
-            
-            System.out.println("Type a message: ");
-
-            while (true) {
-                String message=scanner.nextLine();
-
-                if(message.equals("/quit")){
-                    output.writeUTF(MessageType.QUIT);
-                    output.flush();
-
-                    System.out.println("Disconnecting...");
-                    socket.close();
-
-                    break;
-                }
-
-                output.writeUTF(MessageType.CHAT + "|" + message);
-                output.flush();
-            }
-            System.out.println("Goodbye!");
-            
         } catch (IOException e) {
             // TODO: handle exception
-            e.printStackTrace();
+            return MessageType.ERROR+"|Unable to connect to server";
+        }
+    }
+
+    public boolean sendMessage(String message){
+        try {
+            output.writeUTF(MessageType.CHAT+"|"+message);
+            output.flush();
+            return true;
+        } catch (IOException e) {
+            // TODO: handle exception
+            return false;
         }
     }
     
-    public static void main(String[] args) {
-        new ChatClient();
+    public void disconnect(){
+
+        try {
+            if(output != null){
+                output.writeUTF(MessageType.QUIT);
+                output.flush();
+            }
+
+            if(socket != null && !socket.isClosed()){
+                socket.close();
+            }
+        } catch (IOException ignored) {
+            // TODO: handle exception
+        }
+    }
+
+    public DataInputStream getInputStream(){
+        return input;
+    }
+
+    public Socket getSocket() {
+        return socket;
+    }
+
+    public ClientListener getListener() {
+        return listener;
     }
 }

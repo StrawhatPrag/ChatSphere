@@ -7,9 +7,14 @@ import java.net.Socket;
 public class ClientListener extends Thread {
     private Socket socket;
     private DataInputStream input;
-    
+    private MessageListener messageListener;
+
     public ClientListener(Socket socket) {
         this.socket=socket;
+    }
+
+    public void setMessageListener(MessageListener listener) {
+        this.messageListener=listener;
     }
 
     @Override
@@ -18,10 +23,14 @@ public class ClientListener extends Thread {
             input=new DataInputStream(socket.getInputStream());
             while (true) {
                 String message=input.readUTF();
-                System.out.println(message);
+                if (messageListener!=null) {
+                    messageListener.onMessageReceived(message);
+                }
             }
         } catch (IOException e) {
-            System.out.println("Disconnected from server.");
+            if (messageListener!=null) {
+                messageListener.onMessageReceived("*** Disconnected from server ***");
+            }
         }
     }
 }

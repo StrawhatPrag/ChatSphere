@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="gui.controller.ChatController"
+            prefWidth="700"
+            prefHeight="500">
+
+    <center>
+        <TextArea fx:id="chatArea"
+                  editable="false"
+                  wrapText="true"/>
+    </center>
+
+    <bottom>
+        <HBox spacing="10" style="-fx-padding:10;">
+
+            <TextField fx:id="messageField"
+                       HBox.hgrow="ALWAYS"
+                       promptText="Type your message..."/>
+
+            <Button text="Send"
+                    onAction="#sendMessage"/>
+
+        </HBox>
+    </bottom>
+
+</BorderPane>
