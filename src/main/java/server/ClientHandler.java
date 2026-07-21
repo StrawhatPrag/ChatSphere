@@ -38,6 +38,14 @@ public class ClientHandler extends Thread{
         }
     }
 
+    private void broadcastOthers(String message) {
+        for (ClientHandler client : clients.values()) {
+            if (client != this) {
+                client.sendMessage(message);
+            }
+        }
+    }
+
     private void handlePrivateMessage(String message) {
         String[] parts =message.split(" ",3);
 
@@ -56,9 +64,13 @@ public class ClientHandler extends Thread{
             return;
         }
 
-        receiver.sendMessage("[Private] "+username+": "+privateMessage);
+        receiver.sendMessage(
+            MessageType.PRIVATE + "|" + username + "|" + privateMessage
+        );
 
-        sendMessage("[Private to "+receiverUsername+"] "+privateMessage);
+        sendMessage(
+            MessageType.PRIVATE + "|You -> " + receiverUsername + "|" + privateMessage
+        );
     }
 
     private void handleUsersCommand(){
@@ -102,6 +114,7 @@ public class ClientHandler extends Thread{
             if (existing==null) {
                 username = requestedUsername;
                 sendMessage(MessageType.OK);
+                ChatServer.broadcastUserList();
                 break;
             }
             sendMessage(MessageType.ERROR + "|Username already exists.");
@@ -109,7 +122,7 @@ public class ClientHandler extends Thread{
         System.out.println("Handler started for " + socket.getInetAddress());
         System.out.println(username + " joined the chat.");
 
-        broadcast("*** " + username + " joined the chat ***");
+        broadcastOthers(MessageType.SYSTEM + "|" + username + " joined the chat");
     }
 
     private boolean processPacket(String packet){
@@ -134,9 +147,10 @@ public class ClientHandler extends Thread{
                 sendMessage("Unknown command.\nType /help for available commands.");
             }
             else {
-                String formattedMessage = username + ": " + message;
-                System.out.println(formattedMessage);
-                broadcast(formattedMessage);
+                System.out.println(username + ": " + message);
+                broadcast(
+                    MessageType.CHAT + "|" + username + "|" + message
+                );
             }
         }
         return true;
@@ -154,7 +168,8 @@ public class ClientHandler extends Thread{
     private void cleanup() {
         if (username != null) {
             clients.remove(username);
-            broadcast("*** " + username + " left the chat ***");
+            ChatServer.broadcastUserList();
+            broadcastOthers(MessageType.SYSTEM + "|" + username + " left the chat");
         }
 
         try {

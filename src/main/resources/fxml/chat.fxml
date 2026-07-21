@@ -1,30 +1,74 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
 <BorderPane xmlns:fx="http://javafx.com/fxml"
-            fx:controller="gui.controller.ChatController"
-            prefWidth="700"
-            prefHeight="500">
+            fx:controller="gui.controller.ChatController">
 
+    <!-- Top -->
+    <top>
+        <Label text="ChatSphere"
+               style="-fx-font-size:22px;
+                      -fx-font-weight:bold;
+                      -fx-padding:15;" />
+    </top>
+
+    <!-- Center -->
     <center>
-        <TextArea fx:id="chatArea"
-                  editable="false"
-                  wrapText="true"/>
+
+        <SplitPane dividerPositions="0.25">
+
+            <VBox spacing="10" prefWidth="200">
+
+                <padding>
+                    <Insets top="10" right="10" bottom="10" left="10"/>
+                </padding>
+
+                <Label text="Online Users"/>
+
+                <ListView fx:id="usersList"/>
+
+            </VBox>
+
+            <VBox spacing="10">
+
+                <padding>
+                    <Insets top="10" right="10" bottom="10" left="10"/>
+                </padding>
+
+                <Label text="Conversation"/>
+
+                <ListView fx:id="chatList"
+          VBox.vgrow="ALWAYS"/>
+
+            </VBox>
+
+        </SplitPane>
+
     </center>
 
+    <!-- Bottom -->
+
     <bottom>
-        <HBox spacing="10" style="-fx-padding:10;">
+
+        <HBox spacing="10">
+
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
 
             <TextField fx:id="messageField"
+                       promptText="Type a message..."
                        HBox.hgrow="ALWAYS"
-                       promptText="Type your message..."/>
+                       onAction="#sendMessage"/>
 
             <Button text="Send"
                     onAction="#sendMessage"/>
 
         </HBox>
+
     </bottom>
 
 </BorderPane>

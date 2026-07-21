@@ -52,6 +52,9 @@ public class LoginController {
                 Stage stage=(Stage) connectButton.getScene().getWindow();
                 stage.setScene(new Scene(root));
                 stage.setTitle("ChatSphere");
+                stage.show();
+
+                client.startListening();
             } catch (IOException e) {
                 // TODO: handle exception
                 e.printStackTrace();

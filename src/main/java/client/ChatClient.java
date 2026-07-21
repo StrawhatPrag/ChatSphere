@@ -12,6 +12,7 @@ public class ChatClient {
     private DataOutputStream output;
     private DataInputStream input;
     private ClientListener listener;
+    private String username;
     
     public ChatClient(){
         
@@ -29,14 +30,24 @@ public class ChatClient {
             String response=input.readUTF();
 
             if(response.equals(MessageType.OK)){
-                listener=new ClientListener(socket);
-                listener.start();
+                this.username = username;
+                listener = new ClientListener(socket);
             }
             return response;
 
         } catch (IOException e) {
             // TODO: handle exception
             return MessageType.ERROR+"|Unable to connect to server";
+        }
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void startListening() {
+        if (listener != null) {
+            listener.start();
         }
     }
 
