@@ -8,11 +8,9 @@ import client.UserListListener;
 import gui.model.ChatMessage;
 import gui.util.ChatMessageCell;
 import javafx.fxml.FXML;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.scene.control.ListView;
 import javafx.scene.control.ListView;
 
 
@@ -31,12 +29,7 @@ public class ChatController implements MessageListener,UserListListener{
     @FXML
     private void initialize() {
         chatList.setCellFactory(list -> new ChatMessageCell());
-        usersList.setItems(FXCollections.observableArrayList(
-                "Alice",
-                "Bob",
-                "Charlie"
-        ));
-
+        usersList.setItems(FXCollections.observableArrayList());
     }
 
     public void setClient(ChatClient client){
